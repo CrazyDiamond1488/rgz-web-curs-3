@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block lab %} Расчетно-графическое задание {% endblock %}
+
+{% block main %}
+<link rel="stylesheet" href="{{ url_for('static', filename='rgz.css')}}">
+    <div class="glav_verh">
+        <div style="display: inline;
+                    color: rgb(75, 75, 251);
+                    height: 30px;
+                    font-size: 16pt;
+                    font-weight: bold;
+                    ">
+        Инициативы
+    </div>
+    <div class="container">
+    <a href="/rgz/initiative">Посмотреть инициативы</a>
+    <a href="/rgz/newarticle">Создать инициативы</a>
+    </div>
+    <form action="/rgz/logout">
+        <button class="button1" type="submit">Выйти</button>
+    </form>
+    <form action="/rgz/login">
+        <button class="button1" type="submit">Логин</button>
+    </form>
+    <form style="margin-left: 5%;" action="/rgz/register">
+        <button class="button1" type="submit">Регистрация</button>
+    </form>
+
+        {% if current_user.username %}
+            <div style="font-weight: bold;
+                        margin-left: 1%;" 
+            >
+            {{ current_user.username }}</div>
+        {% else %}
+            <div style="font-weight: bold;">Anon</div>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% for item in initiatives %}
+    <li>
+        <div>
+            <h3>Инициатива №{{ loop.index }}</h3>
+            <p>{{ item.title }}</p>
+            <p>{{ item.article_text }}</p>
+            <p>Дата создания: {{ item.date_created }}</p>
+            <p>Автор: {{ item.user.username }}</p>
+            <p>Голосов "За": {{ item.likes if item.likes is not none else 0 }}</p>
+            <p>Голосов "Против": {{ -item.likes if item.likes is not none else 0 }}</p>
+            <p>Общее количество голосов: {{ item.likes or 0 }}</p>
+            {% if current_user.is_authenticated %}
+                <form action="{{ url_for('rgz.vote', article_id=item.id) }}" method="POST">
+                    <input type="hidden" name="_method" value="POST">
+                    <button type="submit" name="vote" value="up" class="btn btn-success">За</button>
+                    <button type="submit" name="vote" value="down" class="btn btn-danger">Против</button>
+                </form>
+            {% endif %}
+            {% if current_user.is_authenticated and item.user_id == current_user.id %}
+                <form action="{{ url_for('rgz.deleteArticle', article_id=item.id) }}" method="POST">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
+            {% endif %}
+        </div>
+    </li>
+{% endfor %}
+
+{% for item in initiatives %}
+    <!-- код для вывода информации об инициативе -->
+{% endfor %}
+
+<div class="more-initiatives">
+    {% if initiatives.has_next %}
+        <a href="{{ url_for('rgz.getInitiatives', page=initiatives.next_num) }}">Еще</a>
+    {% endif %}
+</div>
+{% endblock %}

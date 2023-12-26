@@ -1,0 +1,29 @@
+{% block main %}
+<link rel="stylesheet" href="{{ url_for('static', filename='rgz.css')}}">
+<div>
+  <div style="display: inline; color: rgb(75, 75, 251); height: 30px; font-size: 16pt; font-weight: bold;">База знаний</div>
+  <div class="container">
+    <a href="/rgz/initiative">Посмотреть инициативы</a>
+    <a href="/rgz/newarticle">Создать инициативы</a>
+  </div>
+  <form action="/rgz/login">
+    <button class="button1" type="submit">Логин</button>
+  </form>
+  <form style="margin-left: 5%;" action="/rgz/register">
+    <button class="button1" type="submit">Регистрация</button>
+  </form>
+  {% if current_user.username %}
+  <div style="font-weight: bold; margin-left: 1%;">
+    {{ current_user.username }}
+  </div>
+  {% else %}
+  <div style="font-weight: bold;">Anon</div>
+  {% endif %}
+</div>
+<div>
+  <h1>{{ title }}</h1>
+  {% for paragraph in initiative.text %}
+  <p>{{ paragraph }}</p>
+  {% endfor %}
+</div>
+{% endblock %}
